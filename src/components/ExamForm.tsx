@@ -11,7 +11,7 @@ import { getExams } from '../actions/exams'
 const ExamForm = () => {
     const { id } = useParams<{ id: string }>()
 
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<any>()
     const navigate = useNavigate()
     const { sectors, exams } = useSelector((state: RootState) => state.exams)
     const [message, setMessage] = useState<MessageData | null>(null)

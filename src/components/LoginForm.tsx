@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux'
 import { setCurrentUser } from '../actions/users'
 
 const LoginForm = () => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<any>()
     const navigate = useNavigate()
     const location = useLocation()
     const [email, setEmail] = useState<string>(location.state && (location.state as any).email ? (location.state as any).email : "")

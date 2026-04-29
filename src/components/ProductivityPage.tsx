@@ -34,7 +34,7 @@ type IconStatusData = {
     text: string;
 }
 const ProductivityLine = ({ exam, examHistory, period, laboratory, readOnly }: ProductivityLineProps) => {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<any>();
     const [history, setHistory] = useState<ExamHistory>({} as ExamHistory)
     const [iconStatus, setIconStatus] = useState<IconStatusData>()
     const { loadingExamID, error, errorExamID } = useSelector((state: RootState) => state.productivity)
@@ -102,7 +102,7 @@ const ProductivityLine = ({ exam, examHistory, period, laboratory, readOnly }: P
 const ProductivityPage = () => {
     const [patientsValue, setPatientsValue] = useState(0)
     const [iconStatus, setIconStatus] = useState<IconStatusData>()
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<any>()
     const limitDate = sub(new Date(), { months: 1 })
     const [year, setYear] = useState<number>(parseInt(format(limitDate, 'yyyy')))
     const [month, setMonth] = useState<number>(parseInt(format(limitDate, 'MM')))

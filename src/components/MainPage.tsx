@@ -25,7 +25,7 @@ import ConsolidatedPage from './ConsolidatedPage';
 
 const MainPage = () => {
     const { currentUser } = useSelector((state: RootState) => state.user)
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<any>()
     const navigate = useNavigate()
     const location = useLocation()
     const logout = () => {

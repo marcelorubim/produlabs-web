@@ -12,7 +12,7 @@ import MessageData from '../types/MessageData'
 const UserForm = () => {
     const reEmail = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
     const reTelephone = /^([0-9]){8,11}$/
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<any>();
     const navigate = useNavigate()
     const { users } = useSelector((state: RootState) => state.user)
     const usersMap = users.reduce<any>((acc, curr) => ({ ...acc, [curr.id]: curr }), {})
