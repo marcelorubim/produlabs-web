@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Form, InputOnChangeData, Select, Button, Message, DropdownProps, FormProps } from 'semantic-ui-react'
 import MessageData from '../types/MessageData'
-import { useHistory, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../reducers'
 import Exam from '../types/Exam'
@@ -9,20 +9,20 @@ import { saveExam } from '../services/exams'
 import { getExams } from '../actions/exams'
 
 const ExamForm = () => {
-    const { id } = useParams()
+    const { id } = useParams<{ id: string }>()
 
     const dispatch = useDispatch()
-    const history = useHistory()
-    const { sectors,exams } = useSelector((state: RootState) => state.exams)
+    const navigate = useNavigate()
+    const { sectors, exams } = useSelector((state: RootState) => state.exams)
     const [message, setMessage] = useState<MessageData | null>(null)
     const [loading, setLoading] = useState<boolean>(false)
-    const [ exam, setExam ] = useState<Exam>(id && exams ? exams.filter(e => e.id === parseInt(id))[0]  : {} as Exam)
-    const goBack = () => history.goBack()
+    const [exam, setExam] = useState<Exam>(id && exams ? exams.filter(e => e.id === parseInt(id))[0] : {} as Exam)
+    const goBack = () => navigate(-1)
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>, { name, value }: InputOnChangeData) => {
-        const newValue = name === 'codeSUS' ?  value.replace(/[^0-9]+/g, "") : value
+        const newValue = name === 'codeSUS' ? value.replace(/[^0-9]+/g, "") : value
         setExam({
             ...exam,
-            [name]:newValue
+            [name]: newValue
         })
     }
     const handleSelect = (event: React.SyntheticEvent<HTMLElement>, { name, value }: DropdownProps) => {
@@ -37,7 +37,7 @@ const ExamForm = () => {
         saveExam({
             ...exam,
             name: exam.name.toUpperCase()
-         }).then(r => {
+        }).then(r => {
             dispatch(getExams())
             setMessage({
                 type: "positive",
@@ -50,7 +50,7 @@ const ExamForm = () => {
             setMessage({
                 type: "negative",
                 title: "Falha ao incluir exame",
-                text: e.message
+                text: (e as any).message
             })
             setLoading(false)
         })
@@ -66,21 +66,18 @@ const ExamForm = () => {
                         name='name'
                     />
                 </Form.Field>
-
                 <Form.Field>
                     <label>Setor</label>
-                    <Select placeholder='Selecione' 
-                    value={exam.sector ? exam.sector.id : undefined}
-                    name='sector'
-                    onChange={handleSelect}
-                    options={sectors.map(l => ({
-                        key: l.id,
-                        value: l.id,
-                        text: l.name
-                    }))}
-
+                    <Select placeholder='Selecione'
+                        value={exam.sector ? exam.sector.id : undefined}
+                        name='sector'
+                        onChange={handleSelect}
+                        options={sectors.map(l => ({
+                            key: l.id,
+                            value: l.id,
+                            text: l.name
+                        }))}
                     />
-
                 </Form.Field>
                 <Form.Field>
                     <label>Código SUS</label>
@@ -91,7 +88,7 @@ const ExamForm = () => {
                     />
                 </Form.Field>
                 <Button secondary onClick={goBack} type="button">Voltar</Button>
-                <Button primary >Salvar</Button>
+                <Button primary>Salvar</Button>
             </Form>
             {message &&
                 <Message floating positive={message.type === 'positive'} info={message.type === 'info'} negative={message.type === 'negative'} warning={message.type === 'warning'}>
@@ -99,7 +96,6 @@ const ExamForm = () => {
                     <p>{message.text}</p>
                 </Message>
             }
-
         </div>
     )
 }

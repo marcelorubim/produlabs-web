@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useParams, useHistory } from 'react-router'
+import { useParams, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '../reducers'
 import User from '../types/User'
@@ -10,16 +10,14 @@ import { getUsers } from '../actions/users'
 import MessageData from '../types/MessageData'
 
 const UserForm = () => {
-    const reEmail = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+    const reEmail = /^(([^<>()[\].,;:\s@"]+(\.[^<>()[\].,;:\s@"]+)*)|(".+"))@(([^<>()[\].,;:\s@"]+\.)+[^<>()[\].,;:\s@"]{2,})$/i;
     const reTelephone = /^([0-9]){8,11}$/
-    const reName = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/
     const dispatch = useDispatch();
-    const history = useHistory()
+    const navigate = useNavigate()
     const { users } = useSelector((state: RootState) => state.user)
     const usersMap = users.reduce<any>((acc, curr) => ({ ...acc, [curr.id]: curr }), {})
     const { laboratories } = useSelector((state: RootState) => state.laboratories)
-    console.log(usersMap)
-    const { id } = useParams()
+    const { id } = useParams<{ id: string }>()
     const [user, setUser] = useState<User>(id && usersMap[id] ? usersMap[id] : {
         email: "",
         fullName: "",
@@ -27,11 +25,11 @@ const UserForm = () => {
         userLaboratories: []
     })
     const [message, setMessage] = useState<MessageData | null>(null)
-    const [loading,setLoading] = useState<boolean>(false)
-    const goBack = () => history.goBack()
+    const [loading, setLoading] = useState<boolean>(false)
+    const goBack = () => navigate(-1)
     const saveUser = () => {
         setMessage(null)
-        if(!reEmail.test(user.email)){
+        if (!reEmail.test(user.email)) {
             setMessage({
                 type: "negative",
                 title: "Dados incorretos",
@@ -39,7 +37,7 @@ const UserForm = () => {
             })
             return
         }
-        if(!user.id && users.filter(u => u.email === user.email).length>0){
+        if (!user.id && users.filter(u => u.email === user.email).length > 0) {
             setMessage({
                 type: "negative",
                 title: "Dados incorretos",
@@ -47,7 +45,7 @@ const UserForm = () => {
             })
             return
         }
-        if(!user.fullName && user.fullName.length < 3){
+        if (!user.fullName && user.fullName.length < 3) {
             setMessage({
                 type: "negative",
                 title: "Dados incorretos",
@@ -55,7 +53,7 @@ const UserForm = () => {
             })
             return
         }
-        if(!reTelephone.test(user.telephone)){
+        if (!reTelephone.test(user.telephone)) {
             setMessage({
                 type: "negative",
                 title: "Dados incorretos",
@@ -63,7 +61,7 @@ const UserForm = () => {
             })
             return
         }
-        if(!user.userProfile){
+        if (!user.userProfile) {
             setMessage({
                 type: "negative",
                 title: "Dados incorretos",
@@ -73,8 +71,8 @@ const UserForm = () => {
         }
         if (user.userProfile === UserProfile.ADMIN) {
             user.userLaboratories = []
-        }else{
-            if(user.userLaboratories.length === 0){
+        } else {
+            if (user.userLaboratories.length === 0) {
                 setMessage({
                     type: "negative",
                     title: "Dados incorretos",
@@ -104,7 +102,7 @@ const UserForm = () => {
             setMessage({
                 type: "negative",
                 title: "Falha ao incluir usuário",
-                text: e.message
+                text: (e as any).message
             })
             setLoading(false)
         })
@@ -170,7 +168,6 @@ const UserForm = () => {
                             { key: UserProfile.ADMIN, value: UserProfile.ADMIN, text: "Administração" },
                             { key: UserProfile.MANAGER, value: UserProfile.MANAGER, text: "Chefe de Laboratório" },
                             { key: UserProfile.USER, value: UserProfile.USER, text: "Usuário" },
-
                         ]} />
                 </Form.Field>
                 {
@@ -185,9 +182,7 @@ const UserForm = () => {
                             onChange={handleAddLaboratory}
                             value={user.userLaboratories.length > 0 ? user.userLaboratories[0].id : -1}
                         />
-
                     </Form.Field>
-
                 }
                 <Button secondary onClick={goBack} type="button">Cancelar</Button>
                 <Button primary onClick={saveUser}>Salvar</Button>

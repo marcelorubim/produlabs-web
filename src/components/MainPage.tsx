@@ -1,9 +1,9 @@
-import React, { ReactNode, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import {
-    Switch,
+    Routes,
     Route,
     Link,
-    useHistory,
+    useNavigate,
     useLocation,
 } from "react-router-dom";
 import {
@@ -22,15 +22,16 @@ import ProductivityPage from './ProductivityPage';
 import { RootState } from '../reducers';
 import UserProfile from '../types/UserProfile';
 import ConsolidatedPage from './ConsolidatedPage';
+
 const MainPage = () => {
     const { currentUser } = useSelector((state: RootState) => state.user)
     const dispatch = useDispatch()
-    const history = useHistory()
+    const navigate = useNavigate()
     const location = useLocation()
     const logout = () => {
         sessionStorage.removeItem("user")
         dispatch(logoutUser())
-        history.push("/")
+        navigate("/")
     }
     useEffect(() => {
         dispatch(getUsers())
@@ -38,7 +39,6 @@ const MainPage = () => {
         dispatch(getExams())
         const response = JSON.parse(sessionStorage.getItem("user") + "")
         dispatch(setCurrentUser(response.user, response.token))
-
     }, [])
     return (
         <div>
@@ -74,55 +74,26 @@ const MainPage = () => {
                     {currentUser?.userProfile === UserProfile.ADMIN
                         && <Link to="/usuarios" style={{ color: location.pathname === '/usuarios' ? '3f72af' : '#f9f7f7', fontSize: 16, fontWeight: 'bold' }}>Usuários</Link>
                     }
-                    
                 </div>
                 <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button onClick={logout} icon='log out' labelPosition='left' content='Sair' style={{ backgroundColor: '#3f72af', color: '#f9f7f7'}} />
+                    <Button onClick={logout} icon='log out' labelPosition='left' content='Sair' style={{ backgroundColor: '#3f72af', color: '#f9f7f7' }} />
                 </div>
-
             </div>
             <div style={{ margin: 50, marginTop: 70 }}>
-                <Switch>
-                    <Route path="/usuarios" exact>
-                        <UsersPage />
-                    </Route>
-                    <Route path="/usuarios/adicionar" exact>
-                        <UserForm />
-                    </Route>
-                    <Route path="/usuarios/:id" exact>
-                        <UserForm />
-                    </Route>
-                    <Route path="/laboratorios" exact>
-                        <LaboratoriesList />
-                    </Route>
-                    <Route path="/exames/adicionar" exact>
-                        <ExamForm />
-                    </Route>
-                    <Route path="/exames/:id" exact>
-                        <ExamForm />
-                    </Route>
-                    <Route path="/exames" exact>
-                        <ExamsPage />
-                    </Route>
-                    <Route path="/produtividade" exact>
-                        <ProductivityPage />
-                    </Route>
-                    <Route path="/consolidado" exact>
-                        <ConsolidatedPage />
-                    </Route>
-                    <Route path="/" exact>
-                        <ProductivityPage />
-                    </Route>
-                </Switch>
+                <Routes>
+                    <Route path="/usuarios" element={<UsersPage />} />
+                    <Route path="/usuarios/adicionar" element={<UserForm />} />
+                    <Route path="/usuarios/:id" element={<UserForm />} />
+                    <Route path="/laboratorios" element={<LaboratoriesList />} />
+                    <Route path="/exames/adicionar" element={<ExamForm />} />
+                    <Route path="/exames/:id" element={<ExamForm />} />
+                    <Route path="/exames" element={<ExamsPage />} />
+                    <Route path="/produtividade" element={<ProductivityPage />} />
+                    <Route path="/consolidado" element={<ConsolidatedPage />} />
+                    <Route path="/" element={<ProductivityPage />} />
+                </Routes>
             </div>
-
         </div>
     )
 }
 export default MainPage
-
-interface IProps {
-    children: ReactNode;
-    path: string;
-    // any other props that come into the component
-}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Form, Segment, InputOnChangeData, Message } from 'semantic-ui-react'
 import { updateCredentials } from '../services/authentication'
-import { useLocation, useHistory } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
 import MessageData from '../types/MessageData'
 
 type State = {
@@ -10,7 +10,7 @@ type State = {
 
 const UpdatePasswordForm = () => {
     const location = useLocation()
-    const history = useHistory()
+    const navigate = useNavigate()
     const [email] = useState<string>(location.state ? (location.state as State).email : "")
     const [loading, setLoading] = useState<boolean>(false)
     const [password, setPassword] = useState<string>("")
@@ -38,42 +38,41 @@ const UpdatePasswordForm = () => {
                 password,
                 newPassword
             })
-            history.push("/login",{
-                message: {
-                    type: 'positive',
-                    title: 'Pronto!',
-                    text: 'Senha alterada com sucesso!'
-                },
-                email
+            navigate("/login", {
+                state: {
+                    message: {
+                        type: 'positive',
+                        title: 'Pronto!',
+                        text: 'Senha alterada com sucesso!'
+                    },
+                    email
+                }
             })
         } catch (e) {
-            if(e.response && e.response.status === 400){
+            if ((e as any).response && (e as any).response.status === 400) {
                 setMessage({
                     type: 'negative',
                     title: 'Nova senha inválida',
                     text: 'A senha deve ter no mínimo 8 caracteres.'
                 })
-            }else{
+            } else {
                 setMessage({
                     type: 'negative',
                     title: 'Ops... algo deu errado!',
-                    text: e.message
+                    text: (e as any).message
                 })
             }
         }
         setLoading(false)
-
     }
     return (
         <div>
-                {message &&
-                    <Message floating info={message.type === 'info'} negative={message.type === 'negative'} warning={message.type === 'warning'}>
-                        <Message.Header>{message.title}</Message.Header>
-                        <p>{message.text}</p>
-                    </Message>
-                }
-
-
+            {message &&
+                <Message floating info={message.type === 'info'} negative={message.type === 'negative'} warning={message.type === 'warning'}>
+                    <Message.Header>{message.title}</Message.Header>
+                    <p>{message.text}</p>
+                </Message>
+            }
             <Form size='large' onSubmit={handleSubmit} className='attached'>
                 <Segment stacked>
                     <Form.Input fluid icon='user' iconPosition='left' placeholder='E-mail'
@@ -106,7 +105,7 @@ const UpdatePasswordForm = () => {
                     />
                     <Button primary fluid size='large' loading={loading}>
                         Alterar Senha
-              </Button>
+                    </Button>
                 </Segment>
             </Form>
         </div>

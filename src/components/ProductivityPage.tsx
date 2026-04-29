@@ -9,7 +9,6 @@ import Sector from '../types/Sector'
 import Exam from '../types/Exam'
 import MessageData from '../types/MessageData'
 import { logoutUser } from '../actions/users'
-import { useHistory } from 'react-router'
 import Laboratory from '../types/Laboratory'
 import { ptBR } from 'date-fns/locale'
 import PatientsHistory from '../types/PatientsHistory'
@@ -179,12 +178,12 @@ const ProductivityPage = () => {
                 setExamsID(result.map(r => r.id.examID))
                 setShowTable(true)
             } catch (e) {
-                if (e.response && e.response.status === 401) {
+                if ((e as any).response && (e as any).response.status === 401) {
                     dispatch(logoutUser())
                 }
                 setMessage({
                     title: 'Erro ao obter dados de produtividade!',
-                    text: e.response && e.response.status === 500 ? 'Tente novamente mais tarde!' : e.message,
+                    text: (e as any).response && (e as any).response.status === 500 ? 'Tente novamente mais tarde!' : (e as any).message,
                     type: 'negative'
                 })
                 setExamsHistory([])
@@ -204,7 +203,7 @@ const ProductivityPage = () => {
                 .catch(e => {
                     setMessage({
                         title: 'Erro ao enviar dados!',
-                        text: e.response && e.response.status === 500 ? 'Tente novamente mais tarde!' : e.message,
+                        text: (e as any).response && (e as any).response.status === 500 ? 'Tente novamente mais tarde!' : (e as any).message,
                         type: 'negative'
                     })
                 })
