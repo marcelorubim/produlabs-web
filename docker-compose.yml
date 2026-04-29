@@ -1,0 +1,43 @@
+version: '3'
+services:
+  web:
+    image: registry.gitlab.com/marcelorubim/produlab-web:latest
+    restart: always
+    ports:
+    - "8080:80"
+    - "8443:443"
+    environment:
+    - API_HOST=api
+    - API_PORT=8080
+    depends_on: 
+    - api
+    # volumes:
+    #- /path/to/letsencrypt/fullchain.pem:/etc/nginx/server.crt
+    #- /path/to/letsencrypt/privkey.pem:/etc/nginx/server.key
+  api:
+    image: registry.gitlab.com/marcelorubim/prodlab:latest
+    restart: always
+    environment:
+    - QUARKUS_DATASOURCE_URL=jdbc:mariadb://mariadb:3306/produlabs
+    - QUARKUS_DATASOURCE_USERNAME=produlabs
+    - QUARKUS_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    depends_on: 
+    - mariadb
+  mariadb:
+    image: mariadb:10
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    ports:
+    - "3306:3306"
+    environment:
+    - MYSQL_DATABASE=produlabs
+    - MYSQL_USER=produlabs
+    - MYSQL_PASSWORD=${DB_PASSWORD}
+    - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    volumes: 
+    - dbprodulabs:/var/lib/mysql
+    - ./sql:/docker-entrypoint-initdb.d
+volumes:
+  dbprodulabs:
+
+
+    # sudo docker exec produlabs_produlabs_mariadb_1 sh -c 'exec mysqldump produlabs -uroot -p${DB_ROOT_PASSWORD}' > produlabs.sql
