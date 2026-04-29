@@ -10,7 +10,7 @@ import { getExams } from '../actions/exams'
 
 
 const ExamList = () => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<any>()
     const { activeExams, loading } = useSelector((state: RootState) => state.exams)
     const { currentUser } = useSelector((state: RootState) => state.user)
     const [examToDelete, setExamToDelete] = useState<Exam>()
