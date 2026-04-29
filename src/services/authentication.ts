@@ -13,7 +13,7 @@ export async function authenticate(request : AuthenticationRequest) : Promise<Au
         }
         return response.data
     }catch(e){
-        if(e.response.status === 401){
+        if((e as any).response?.status === 401){
             throw Error("E-mail e/ou senha inválidos.")
         }
         throw Error("Erro inesperado. Tente novamente mais tarde!")

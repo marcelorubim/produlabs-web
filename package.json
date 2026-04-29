@@ -47,5 +47,13 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:8080"
+  "proxy": "http://localhost:8080",
+  "overrides": {
+    "terser-webpack-plugin": {
+      "schema-utils": {
+        "ajv": "^8.12.0",
+        "ajv-keywords": "^5.0.0"
+      }
+    }
+  }
 }

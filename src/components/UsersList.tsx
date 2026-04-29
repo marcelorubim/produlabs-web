@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { RootState } from '../reducers'
 import UserProfile from '../types/UserProfile'
-import { parseISO } from 'date-fns/esm'
+import { parseISO } from 'date-fns'
 import { format } from 'date-fns'
 
 const UsersList = () => {

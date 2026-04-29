@@ -33,6 +33,7 @@ if (process.env.NODE_ENV === 'development') {
 
 const store = createStore(
     reducers,
+    undefined,
     applyMiddleware(...middlewares)
 );
 sagaMiddleware.run(sagas)
