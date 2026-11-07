@@ -9,6 +9,7 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { getExamsYearHistory } from '../services/productivity'
 import ExamHistory from '../types/ExamHistory'
+import UserLaboratorySelect from './UserLaboratorySelect'
 
 const ConsolidatedPage = () => {
     const [year, setYear] = useState<number>(parseInt(format(new Date(), 'yyyy')))
@@ -16,7 +17,8 @@ const ConsolidatedPage = () => {
     const { laboratories } = useSelector((state: RootState) => state.laboratories)
     const { currentUser } = useSelector((state: RootState) => state.user)
 
-    const [laboratory, setLaboratory] = useState<Laboratory | null>(currentUser && currentUser.userProfile === UserProfile.MANAGER ? currentUser.userLaboratories[0] : null)
+    const isAdmin = currentUser?.userProfile === UserProfile.ADMIN
+    const [laboratory, setLaboratory] = useState<Laboratory | null>(currentUser && !isAdmin ? currentUser.userLaboratories[0] : null)
     const [examsHistory, setExamsHistory] = useState<ExamHistory[]>([])
 
     const handleSelectLaboratory = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
@@ -27,6 +29,10 @@ const ConsolidatedPage = () => {
             setLaboratory(null)
         }
     }
+
+    useEffect(() => {
+        if (!isAdmin && currentUser) setLaboratory(current => currentUser.userLaboratories.find(l => l.id === current?.id) ?? currentUser.userLaboratories[0])
+    }, [currentUser])
 
     useEffect(() => {
         getExamsYearHistory(2020)
@@ -44,7 +50,7 @@ const ConsolidatedPage = () => {
             }}>
                 <h3>Consolidado</h3>
                 {
-                    currentUser?.userProfile !== UserProfile.MANAGER ?
+                    isAdmin ?
                         <Select placeholder='Selecione'
                             style={{
                                 width: 300
@@ -65,7 +71,11 @@ const ConsolidatedPage = () => {
                                 }))]}
                         />
                         :
-                        <h3>{laboratory?.name}</h3>
+                        <UserLaboratorySelect
+                            laboratories={currentUser?.userLaboratories ?? []}
+                            value={laboratory}
+                            onChange={setLaboratory}
+                        />
                 }
             </div>
             <div style={{

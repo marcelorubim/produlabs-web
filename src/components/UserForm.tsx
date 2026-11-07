@@ -14,9 +14,10 @@ const UserForm = () => {
     const reTelephone = /^([0-9]){8,11}$/
     const dispatch = useDispatch<any>();
     const navigate = useNavigate()
-    const { users } = useSelector((state: RootState) => state.user)
+    const { users, currentUser } = useSelector((state: RootState) => state.user)
     const usersMap = users.reduce<any>((acc, curr) => ({ ...acc, [curr.id]: curr }), {})
-    const { laboratories } = useSelector((state: RootState) => state.laboratories)
+    const { laboratories: allLaboratories } = useSelector((state: RootState) => state.laboratories)
+    const laboratories = currentUser?.userProfile === UserProfile.ADMIN ? allLaboratories : currentUser?.userLaboratories ?? []
     const { id } = useParams<{ id: string }>()
     const [user, setUser] = useState<User>(id && usersMap[id] ? usersMap[id] : {
         email: "",
@@ -76,7 +77,7 @@ const UserForm = () => {
                 setMessage({
                     type: "negative",
                     title: "Dados incorretos",
-                    text: "Selecione o laboratório vinculado ao usuário"
+                    text: "Selecione ao menos um laboratório vinculado ao usuário"
                 })
                 return
             }
@@ -125,10 +126,12 @@ const UserForm = () => {
             [name]: value
         })
     }
-    const handleAddLaboratory = (event: React.SyntheticEvent<HTMLElement>, { value }: DropdownProps) => {
+    const handleLaboratoriesChange = (event: React.SyntheticEvent<HTMLElement>, { value }: DropdownProps) => {
+        const selectedIds = value as number[]
         setUser({
             ...user,
-            userLaboratories: laboratories.filter(l => l.id === value)
+            // Keeps selection order: other pages treat userLaboratories[0] as the user's laboratory
+            userLaboratories: selectedIds.flatMap(selectedId => laboratories.filter(l => l.id === selectedId))
         })
     }
     return (
@@ -173,14 +176,14 @@ const UserForm = () => {
                 {
                     user.userProfile && user.userProfile !== UserProfile.ADMIN &&
                     <Form.Field>
-                        <label>Laboratório</label>
-                        <Select placeholder='Selecione' options={laboratories.map(l => ({
+                        <label>Laboratórios</label>
+                        <Select multiple placeholder='Selecione' options={laboratories.map(l => ({
                             key: l.id,
                             value: l.id,
                             text: l.name
                         }))}
-                            onChange={handleAddLaboratory}
-                            value={user.userLaboratories.length > 0 ? user.userLaboratories[0].id : -1}
+                            onChange={handleLaboratoriesChange}
+                            value={user.userLaboratories.map(l => l.id)}
                         />
                     </Form.Field>
                 }

@@ -2,10 +2,13 @@ import React from 'react'
 import { Table, Dimmer, Loader} from 'semantic-ui-react'
 import { useSelector } from 'react-redux'
 import { RootState } from '../reducers'
+import UserProfile from '../types/UserProfile'
 
 
 const LaboratoriesList = () => {
-    const { laboratories, loading } = useSelector( (state: RootState) => state.laboratories)   
+    const { laboratories: allLaboratories, loading } = useSelector( (state: RootState) => state.laboratories)   
+    const { currentUser } = useSelector((state: RootState) => state.user)
+    const laboratories = currentUser?.userProfile === UserProfile.ADMIN ? allLaboratories : currentUser?.userLaboratories ?? []
 
     if (loading) {
         return (

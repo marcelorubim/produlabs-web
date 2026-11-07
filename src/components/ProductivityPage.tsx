@@ -20,6 +20,7 @@ import months from '../utils/months'
 import ProductivityYear from './ProductivityYear'
 import NumberFormatted from './NumberFormatted'
 import LaboratorySummary from '../types/LaboratorySummary'
+import UserLaboratorySelect from './UserLaboratorySelect'
 
 type ProductivityLineProps = {
     exam: Exam;
@@ -112,7 +113,7 @@ const ProductivityPage = () => {
     const [sector, setSector] = useState<Sector>()
     const [exam, setExam] = useState<Exam>()
     const { currentUser } = useSelector((state: RootState) => state.user)
-    const isAdmin = currentUser?.userProfile === UserProfile.ADMIN || currentUser?.userProfile === UserProfile.USER;
+    const isAdmin = currentUser?.userProfile === UserProfile.ADMIN;
     const [laboratory, setLaboratory] = useState<Laboratory | null>(currentUser && !isAdmin ? currentUser.userLaboratories[0] : null)
     const { sectors, exams, activeExams, examsMap } = useSelector((state: RootState) => state.exams)
     const [examsID, setExamsID] = useState<number[]>([]);
@@ -143,7 +144,7 @@ const ProductivityPage = () => {
         })
     }
     useEffect(() => {
-        if (!isAdmin && currentUser) setLaboratory(currentUser.userLaboratories[0])
+        if (!isAdmin && currentUser) setLaboratory(current => currentUser.userLaboratories.find(l => l.id === current?.id) ?? currentUser.userLaboratories[0])
     }, [currentUser])
     useEffect(() => {
         if (!currentUser) return;
@@ -261,7 +262,11 @@ const ProductivityPage = () => {
                                 }))]}
                         />
                         :
-                        <h3>{currentUser?.userLaboratories[0].name}</h3>
+                        <UserLaboratorySelect
+                            laboratories={currentUser?.userLaboratories ?? []}
+                            value={laboratory}
+                            onChange={setLaboratory}
+                        />
                 }
 
             </div>

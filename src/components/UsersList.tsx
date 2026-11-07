@@ -51,7 +51,7 @@ const UsersList = () => {
                                 <br/>
                                 <span style={{
                                 fontSize: 10
-                            }}><i>{user.userProfile && user.userLaboratories[0].name}</i></span>
+                            }}><i>{user.userLaboratories.map(l => l.name).join(', ')}</i></span>
                             </div>
                             :
                             <span>
